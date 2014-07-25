@@ -2,6 +2,16 @@ FoldText
 
 ==
 
+This is a modification of the `CustomFoldText` function that is more amenable to
+`syntax` folds.
+
+It can be found at
+
+https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim
+
+and is in turn a modification of the `CustomFoldText` function of Greg Sexton at
+
+http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold
 
 ==
 
