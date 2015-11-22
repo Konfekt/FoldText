@@ -34,20 +34,20 @@ function! CustomFoldText(delim)
 
   " build up foldtext
   let foldLineTail = foldSizeStr . foldPercentage
-  let lengthTail = strlen(foldLineTail)
-  let foldLineHead = strpart(foldLineHead, 0, w - (lengthTail +3))
+  let lengthTail = strwidth(foldLineTail)
+  let lengthHead = w - (lengthTail + 4)
+
+  if strwidth(foldLineHead) > lengthHead
+    let foldLineHead = strpart(foldLineHead, 0, lengthHead + 2) . '..'
+  endif
+
+  let lengthMiddle = w - strwidth(foldLineHead.foldLineTail)
 
   " truncate foldtext according to window width
-  if exists("*strwdith")
-    let expansionString = repeat(a:delim, w - strwidth(foldLineHead.foldLineTail))
-  else
-    let expansionString = repeat(a:delim, w - strlen(substitute(foldLineHead.foldLineTail, '.', 'x', 'g')))
-  endif
+  let expansionString = repeat(a:delim, lengthMiddle)
 
   let foldLine = foldLineHead . expansionString . foldLineTail
   return foldLine
 endfunction
 
-" use '.' as delimiter
-set foldtext=CustomFoldText('.')
-
+set foldtext=CustomFoldText('\ ')
