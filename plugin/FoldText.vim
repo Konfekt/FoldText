@@ -35,10 +35,10 @@ function! CustomFoldText(delim)
   " build up foldtext
   let foldLineTail = foldSizeStr . foldPercentage
   let lengthTail = strwidth(foldLineTail)
-  let lengthHead = w - (lengthTail + 4)
+  let lengthHead = w - (lengthTail + 2)
 
   if strwidth(foldLineHead) > lengthHead
-    let foldLineHead = strpart(foldLineHead, 0, lengthHead + 2) . '..'
+    let foldLineHead = strpart(foldLineHead, 0, lengthHead - 1) . '..'
   endif
 
   let lengthMiddle = w - strwidth(foldLineHead.foldLineTail)
@@ -51,3 +51,4 @@ function! CustomFoldText(delim)
 endfunction
 
 set foldtext=CustomFoldText('\ ')
+

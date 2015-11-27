@@ -2,22 +2,18 @@ FoldText
 
 ==
 
-This is a modification of the `CustomFoldText` function that is more amenable to
-`syntax` folds.
+This
 
-It can be found at
+![snapshot](./snapshot.png)
 
-https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim
-
-and is in turn a modification of the `CustomFoldText` function of Greg Sexton at
-
-http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold
+is a modification of the [`CustomFoldText` function by Christian Brabandt](https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim) that is more amenable to
+`syntax` folds (which in turn is a modification of the [`CustomFoldText` function by Greg Sexton](http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold).
 
 ==
 
 Example settings
 
-```
+```vim
 set foldmethod=syntax
 
 " { Syntax Folding
@@ -31,40 +27,35 @@ set foldmethod=syntax
 " }
 
 set foldenable
-set foldcolumn=4
-set foldnestmax=3
 set foldlevel=0
 set foldlevelstart=0
 " specifies for which commands a fold will be opened
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
-" set foldopen=all
-" set foldclose=all
+
+nnoremap <silent> zr zr:<c-u>setlocal foldlevel?<CR>
+nnoremap <silent> zm zm:<c-u>setlocal foldlevel?<CR>
+
+nnoremap <silent> zR zR:<c-u>setlocal foldlevel?<CR>
+nnoremap <silent> zM zM:<c-u>setlocal foldlevel?<CR>
 
 " Change Option Folds
-nnoremap zi :call <SID>ToggleFoldcolumn()<CR>
+nnoremap zi  :<c-u>call <SID>ToggleFoldcolumn(1)<CR>
+nnoremap coz :<c-u>call <SID>ToggleFoldcolumn(0)<CR>
+nmap     cof coz
 
-nnoremap <expr> zl &wrap ? 'zx' : 'zl'
-
-nnoremap <silent> zr zr:setlocal foldlevel?<cr>
-nnoremap <silent> zm zm:setlocal foldlevel?<cr>
-
-nnoremap <silent> zR zR:setlocal foldlevel?<cr>
-nnoremap <silent> zM zM:setlocal foldlevel?<cr>
-
-function! s:ToggleFoldcolumn()
+function! s:ToggleFoldcolumn(fold)
   if &foldcolumn
     let w:foldcolumn = &foldcolumn
     silent setlocal foldcolumn=0
-    silent setlocal nofoldenable
+    if a:fold | silent setlocal nofoldenable | endif
   else
       if exists('w:foldcolumn') && (w:foldcolumn!=0)
         silent let &l:foldcolumn=w:foldcolumn
       else
         silent setlocal foldcolumn=4
       endif
-      silent setlocal foldenable
+      if a:fold | silent setlocal foldenable | endif
   endif
   setlocal foldcolumn?
 endfunction
-
 ```
