@@ -26,7 +26,7 @@ function! CustomFoldText(delim)
   let lineCount = line("$")
   if has("float")
     try
-      let foldPercentage = printf("[%.1f", (foldSize*1.0)/lineCount*100) . "%] "
+      let foldPercentage = "[" . printf("%4s", printf("%.1f", (foldSize*1.0)/lineCount*100)) . "%] "
     catch /^Vim\%((\a\+)\)\=:E806/	" E806: Using Float as String
       let foldPercentage = printf("[of %d lines] ", lineCount)
     endtry
