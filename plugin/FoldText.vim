@@ -38,7 +38,7 @@ function! CustomFoldText(delim)
   let lengthHead = w - (lengthTail + indent)
 
   if strwidth(foldLineHead) > lengthHead
-    let foldLineHead = strpart(foldLineHead, 0, lengthHead - 1) . '..'
+    let foldLineHead = strpart(foldLineHead, 0, lengthHead-2) . '..'
   endif
 
   let lengthMiddle = w - strwidth(foldLineHead.foldLineTail)
