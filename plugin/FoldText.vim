@@ -3,8 +3,10 @@
 " the folded line, that is, the number of lines folded (absolute and relative)
 function! CustomFoldText(delim)
   "get first non-blank line
-  let fs = v:foldstart
-  while getline(fs) =~ '^\s*$' | let fs = nextnonblank(fs + 1)
+  let fs = nextnonblank(v:foldstart)
+
+  while getline(fs) =~# '^\s\+$'
+    let fs = nextnonblank(fs + 1)
   endwhile
   if fs > v:foldend
       let line = getline(v:foldstart)
