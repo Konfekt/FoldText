@@ -5,9 +5,6 @@ function! CustomFoldText(delim)
   "get first non-blank line
   let fs = nextnonblank(v:foldstart)
 
-  while getline(fs) =~# '^\s\+$'
-    let fs = nextnonblank(fs + 1)
-  endwhile
   if fs > v:foldend
       let line = getline(v:foldstart)
   else
