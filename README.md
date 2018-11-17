@@ -1,20 +1,14 @@
-FoldText
-
-==
-
-This
+This screenshot
 
 <div align="center">
 <img alt="Screenshot" src="https://raw.github.com/Konfekt/FoldText/master/screenshot.png"/>
 <br><br>
 </div>
 
-is a modification of the [`CustomFoldText` function by Christian Brabandt](https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim) that is more amenable to
-`syntax` folds (which in turn is a modification of the [`CustomFoldText` function by Greg Sexton](http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold).
+shows a modification of the `CustomFoldText` [function by Christian Brabandt](https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim) that is more amenable to `syntax` folds.
+(Which in turn is a modification of the `CustomFoldText` [function by Greg Sexton](http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold)).
 
-==
-
-Example settings
+# Example settings
 
 ```vim
 set foldmethod=syntax
