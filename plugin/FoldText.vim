@@ -17,7 +17,7 @@ function! CustomFoldText(delim)
   let foldLineHead = substitute(line, '^\s*', foldLevelStr, '')
 
   " size foldtext according to window width
-  let w = winwidth(0) - &foldcolumn - (&number ? &numberwidth : 0)
+  let w = winwidth(0) - &foldcolumn - (&number ? &numberwidth : 0) - (&l:signcolumn is# 'yes' ? 2 : 0)
   let foldSize = 1 + v:foldend - v:foldstart
 
   " estimate fold length
