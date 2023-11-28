@@ -2,27 +2,26 @@
 " Always show some delimiters (the argument of CustomFoldText) and the tail of
 " the folded line, that is, the number of lines folded (absolute and relative)
 function! CustomFoldText(delim)
-  "get first non-blank line
-  let fs = nextnonblank(v:foldstart)
-
-  if fs > v:foldend
-      let line = getline(v:foldstart)
-  else
-      let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
+  " Ensure delimiter is provided
+  if empty(a:delim)
+    let a:delim = ' '
   endif
 
-  " indent foldtext corresponding to foldlevel
-  let indent = repeat(' ',shiftwidth())
-  let foldLevelStr = repeat(indent, v:foldlevel-1)
-  let foldLineHead = substitute(line, '^\s*', foldLevelStr, '')
+  " Get first non-blank line within the fold
+  let fs = nextnonblank(v:foldstart)
+  if fs == 0 || fs > v:foldend
+    let line = getline(v:foldstart)
+  else
+    let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
+  endif
 
-  " size foldtext according to window width
-  let w = winwidth(0) - &foldcolumn - (&number ? &numberwidth : 0) - (&l:signcolumn is# 'yes' ? 2 : 0)
+  " Estimate fold length
   let foldSize = 1 + v:foldend - v:foldstart
-
-  " estimate fold length
   let foldSizeStr = " " . foldSize . " lines "
   let lineCount = line("$")
+
+  " Calculate fold percentage if floating point support is available
+  let foldPercentage = ''
   if has("float")
     try
       let foldPercentage = "[" . printf("%4s", printf("%.1f", (foldSize*1.0)/lineCount*100)) . "%] "
@@ -31,22 +30,35 @@ function! CustomFoldText(delim)
     endtry
   endif
 
-  " build up foldtext
-  let foldLineTail = foldSizeStr . foldPercentage
-  let lengthTail = strwidth(foldLineTail)
-  let lengthHead = w - (lengthTail + indent)
+  " Build up foldtext
+  let tail = foldSizeStr . foldPercentage
 
-  if strwidth(foldLineHead) > lengthHead
-    let foldLineHead = strpart(foldLineHead, 0, lengthHead-2) . '..'
+  " Calculate maximum width for the foldtext
+  let maxWidth = winwidth(0) - &foldcolumn - (&number ? &numberwidth : 0) - (&signcolumn ==# 'yes' ? &numberwidth : 0)
+
+  " Indent foldtext corresponding to foldlevel
+  let indent = repeat(' ', shiftwidth())
+  let foldLevelStr = repeat(indent, v:foldlevel - 1)
+  let head = substitute(line, '^\s*', foldLevelStr, '')
+
+  " Calculate available space for the head after adding the tail
+  let lengthTail = strwidth(tail)
+  let lengthHead = maxWidth - lengthTail
+
+  " Truncate foldtext according to window width
+  if strwidth(head) > LengthHead
+    let cutLengthHead = LengthHead - strwidth('..')
+    if cutLengthHead < 0
+      let cutLengthHead = 0
+    endif
+    let head = strpart(head, 0, cutLengthHead) . '..'
   endif
 
-  let lengthMiddle = w - strwidth(foldLineHead.foldLineTail)
+  " Calculate space for the delimiter
+  let lengthMiddle = maxWidth - strwidth(head) - lengthTail
+  let middle = repeat(a:delim, lengthMiddle)
 
-  " truncate foldtext according to window width
-  let expansionString = repeat(a:delim, lengthMiddle)
-
-  let foldLine = foldLineHead . expansionString . foldLineTail
-  return foldLine
+  return head . middle . tail
 endfunction
 
 set foldtext=CustomFoldText('\ ')
