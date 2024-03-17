@@ -3,9 +3,7 @@
 " the folded line, that is, the number of lines folded (absolute and relative)
 function! CustomFoldText(delim)
   " Ensure delimiter is provided
-  if empty(a:delim)
-    let a:delim = ' '
-  endif
+  let delim = empty(a:delim) ? ' ' : a:delim
 
   " Get first non-blank line within the fold
   let fs = nextnonblank(v:foldstart)
@@ -56,7 +54,7 @@ function! CustomFoldText(delim)
 
   " Calculate space for the delimiter
   let lengthMiddle = maxWidth - strwidth(head) - lengthTail
-  let middle = repeat(a:delim, lengthMiddle)
+  let middle = repeat(delim, lengthMiddle)
 
   return head . middle . tail
 endfunction
