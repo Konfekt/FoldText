@@ -44,8 +44,8 @@ function! CustomFoldText(delim)
   let lengthHead = maxWidth - lengthTail
 
   " Truncate foldtext according to window width
-  if strwidth(head) > LengthHead
-    let cutLengthHead = LengthHead - strwidth('..')
+  if strwidth(head) > lengthHead
+    let cutLengthHead = lengthHead - strwidth('..')
     if cutLengthHead < 0
       let cutLengthHead = 0
     endif
