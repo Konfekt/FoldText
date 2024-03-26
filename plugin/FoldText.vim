@@ -1,9 +1,9 @@
 " Modification of https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim
 " Always show some delimiters (the argument of CustomFoldText) and the tail of
 " the folded line, that is, the number of lines folded (absolute and relative)
-function! CustomFoldText(delim)
-  " Ensure delimiter is provided
-  let delim = empty(a:delim) ? ' ' : a:delim
+function! CustomFoldText(...)
+  " default to blank as delimiter
+  let delim = a:0 > 0 && !empty(a:1) ? a:1 : ' '
 
   " Get first non-blank line within the fold
   let fs = nextnonblank(v:foldstart)
@@ -59,5 +59,5 @@ function! CustomFoldText(delim)
   return head . middle . tail
 endfunction
 
-set foldtext=CustomFoldText('\ ')
+set foldtext=CustomFoldText()
 
