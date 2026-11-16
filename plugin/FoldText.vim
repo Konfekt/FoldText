@@ -41,17 +41,23 @@ function! s:Truncate(str, width) abort
   return str
 endfunction
 
+" Replace each tab by the blanks up to the next tab stop, as displayed.
+function! s:ExpandTabs(str) abort
+  let parts = split(a:str, '\t', 1)
+  let str = parts[0]
+  for part in parts[1:]
+    let str .= repeat(' ', strdisplaywidth("\t", strdisplaywidth(str))) . part
+  endfor
+  return str
+endfunction
+
 function! CustomFoldText(...) abort
   " default to blank as delimiter
   let delim = a:0 > 0 && !empty(a:1) ? a:1 : ' '
 
   " Get first non-blank line within the fold
   let fs = nextnonblank(v:foldstart)
-  if fs == 0 || fs > v:foldend
-    let line = getline(v:foldstart)
-  else
-    let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
-  endif
+  let line = fs == 0 || fs > v:foldend ? '' : getline(fs)
 
   " Tail: number of folded lines, absolute and relative to the buffer
   let foldSize = 1 + v:foldend - v:foldstart
@@ -62,7 +68,7 @@ function! CustomFoldText(...) abort
 
   " Indent foldtext corresponding to foldlevel
   let foldLevelStr = repeat(' ', shiftwidth() * (v:foldlevel - 1))
-  let head = substitute(line, '^\s*', foldLevelStr, '')
+  let head = s:ExpandTabs(foldLevelStr . substitute(line, '^\s*', '', ''))
 
   " Truncate the head so that head and tail fit into the window
   let maxWidth = winwidth(0) - s:TextOff()
@@ -80,7 +86,10 @@ function! CustomFoldText(...) abort
   return head . middle . tail
 endfunction
 
-set foldtext=CustomFoldText()
+" Keep a CustomFoldText() with a delimiter already set, e.g. in the vimrc.
+if &g:foldtext !~# '^CustomFoldText('
+  set foldtext=CustomFoldText()
+endif
 
 let &cpoptions = s:cpo_save
 unlet s:cpo_save

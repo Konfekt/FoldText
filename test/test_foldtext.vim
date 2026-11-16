@@ -92,8 +92,9 @@ function! Test_SkipsLeadingBlankLinesAndIndentsByLevel() abort
   3,5fold
   1,6fold
   normal! zM
-  " Outer fold (level 1) starts on a blank line: show the next non-blank one.
-  call assert_match('^foo    bar ', foldtextresult(1))
+  " Outer fold (level 1) starts on a blank line: show the next non-blank one,
+  " with the inner tab expanded to the next tab stop.
+  call assert_match('^foo bar ', foldtextresult(1))
   1foldopen
   " Inner fold (level 2) is indented by one 'shiftwidth'.
   call assert_match('^  line 3 ', foldtextresult(3))
@@ -119,6 +120,28 @@ function! Test_TextOffFallbackMatchesTextoff() abort
             \ n . ' lines, ' . opts)
     endfor
   endfor
+endfunction
+
+function! Test_ExpandsTabsToTabStops() abort
+  call s:Setup(10, "a\tb\tc")
+  setlocal tabstop=4
+  call assert_match('^a   b   c ', foldtextresult(1))
+  setlocal tabstop=8
+  call assert_match('^a       b       c ', foldtextresult(1))
+  call assert_equal(s:TextWidth(), strwidth(foldtextresult(1)))
+endfunction
+
+" A delimiter set in the vimrc, that is, before the plugin is loaded, stays.
+function! Test_KeepsFoldtextWithDelimiter() abort
+  let saved = &g:foldtext
+  try
+    set foldtext=CustomFoldText('·')
+    unlet g:loaded_foldtext
+    execute 'source ' . fnameescape(s:root . '/plugin/FoldText.vim')
+    call assert_equal("CustomFoldText('·')", &g:foldtext)
+  finally
+    let &g:foldtext = saved
+  endtry
 endfunction
 
 function! Test_SetsFoldtext() abort
