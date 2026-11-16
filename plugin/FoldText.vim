@@ -1,7 +1,47 @@
 " Modification of https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim
 " Always show some delimiters (the argument of CustomFoldText) and the tail of
 " the folded line, that is, the number of lines folded (absolute and relative)
-function! CustomFoldText(...)
+
+if exists('g:loaded_foldtext')
+  finish
+endif
+let g:loaded_foldtext = 1
+
+let s:cpo_save = &cpoptions
+set cpoptions&vim
+
+" Number of screen cells taken by the fold, number and sign columns.
+function! s:TextOff() abort
+  let info = get(getwininfo(win_getid()), 0, {})
+  return has_key(info, 'textoff') ? info.textoff : s:TextOffFallback()
+endfunction
+
+" Estimate for Vim and Neovim versions whose getwininfo() lacks 'textoff'.
+function! s:TextOffFallback() abort
+  let off = str2nr(&foldcolumn)
+  if &number || &relativenumber
+    let maxNumber = &number ? line('$') : winheight(0)
+    let off += max([&numberwidth, len(string(maxNumber)) + 1])
+  endif
+  if &signcolumn =~# '^yes'
+    let off += 2
+  endif
+  return off
+endfunction
+
+" Cut a:str to at most a:width screen cells without splitting characters.
+function! s:Truncate(str, width) abort
+  if a:width <= 0
+    return ''
+  endif
+  let str = strcharpart(a:str, 0, a:width)
+  while strwidth(str) > a:width
+    let str = strcharpart(str, 0, strchars(str) - 1)
+  endwhile
+  return str
+endfunction
+
+function! CustomFoldText(...) abort
   " default to blank as delimiter
   let delim = a:0 > 0 && !empty(a:1) ? a:1 : ' '
 
@@ -13,51 +53,34 @@ function! CustomFoldText(...)
     let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
   endif
 
-  " Estimate fold length
+  " Tail: number of folded lines, absolute and relative to the buffer
   let foldSize = 1 + v:foldend - v:foldstart
-  let foldSizeStr = " " . foldSize . " lines "
-  let lineCount = line("$")
-
-  " Calculate fold percentage if floating point support is available
-  let foldPercentage = ''
-  if has("float")
-    try
-      let foldPercentage = "[" . printf("%4s", printf("%.1f", (foldSize*1.0)/lineCount*100)) . "%] "
-    catch /^Vim\%((\a\+)\)\=:E806/	" E806: Using Float as String
-      let foldPercentage = printf("[of %d lines] ", lineCount)
-    endtry
+  let tail = ' ' . foldSize . ' lines '
+  if has('float')
+    let tail .= '[' . printf('%4s', printf('%.1f', foldSize * 100.0 / line('$'))) . '%] '
   endif
-
-  " Build up foldtext
-  let tail = foldSizeStr . foldPercentage
-
-  " Calculate maximum width for the foldtext
-  let maxWidth = winwidth(0) - &foldcolumn - (&number ? &numberwidth : 0) - (&signcolumn ==# 'yes' ? &numberwidth : 0)
 
   " Indent foldtext corresponding to foldlevel
-  let indent = repeat(' ', shiftwidth())
-  let foldLevelStr = repeat(indent, v:foldlevel - 1)
+  let foldLevelStr = repeat(' ', shiftwidth() * (v:foldlevel - 1))
   let head = substitute(line, '^\s*', foldLevelStr, '')
 
-  " Calculate available space for the head after adding the tail
-  let lengthTail = strwidth(tail)
-  let lengthHead = maxWidth - lengthTail
-
-  " Truncate foldtext according to window width
+  " Truncate the head so that head and tail fit into the window
+  let maxWidth = winwidth(0) - s:TextOff()
+  let lengthHead = maxWidth - strwidth(tail)
   if strwidth(head) > lengthHead
-    let cutLengthHead = lengthHead - strwidth('..')
-    if cutLengthHead < 0
-      let cutLengthHead = 0
-    endif
-    let head = strpart(head, 0, cutLengthHead) . '..'
+    let head = s:Truncate(head, lengthHead - strwidth('..')) . '..'
   endif
 
-  " Calculate space for the delimiter
-  let lengthMiddle = maxWidth - strwidth(head) - lengthTail
-  let middle = repeat(delim, lengthMiddle)
+  " Fill the gap between head and tail with the delimiter
+  let lengthMiddle = maxWidth - strwidth(head) - strwidth(tail)
+  let middle = lengthMiddle > 0 ? repeat(delim, lengthMiddle) : ''
+  let middle = s:Truncate(middle, lengthMiddle)
+  let middle .= repeat(' ', lengthMiddle - strwidth(middle))
 
   return head . middle . tail
 endfunction
 
 set foldtext=CustomFoldText()
 
+let &cpoptions = s:cpo_save
+unlet s:cpo_save
