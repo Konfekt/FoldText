@@ -33,9 +33,9 @@ CustomFoldText([{delim}])
                 set foldtext=CustomFoldText('·')
                 set foldtext=CustomFoldText('-')
 <
-The plugin sets 'foldtext' to `CustomFoldText()` when it is loaded. To use a
-different delimiter, set 'foldtext' after the plugin has been loaded, for
-example in an |after-directory| plugin or a |VimEnter| autocommand.
+The plugin sets 'foldtext' to `CustomFoldText()` when it is loaded, unless it
+is already set to `CustomFoldText(...)`. So, to use a different delimiter, set
+'foldtext' to, say, `CustomFoldText('·')` in your vimrc.
 
                                                           *g:loaded_foldtext*
 Set `g:loaded_foldtext` to 1 to prevent the plugin from loading.

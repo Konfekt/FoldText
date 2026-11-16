@@ -12,7 +12,7 @@ shows a modification of the `CustomFoldText` [function by Christian Brabandt](ht
 
 The plugin sets `foldtext` to `CustomFoldText()`.
 Each closed fold then shows its first non-blank line, indented by `shiftwidth` per fold level, and, flush with the right window border, the number of folded lines, absolute and relative to the buffer.
-The gap in between is filled with blanks; to fill it with another delimiter, such as `·` or `-`, set, after the plugin has been loaded (for example in an `after/plugin` file),
+The gap in between is filled with blanks; to fill it with another delimiter, such as `·` or `-`, set in your `vimrc`
 
 ```vim
 set foldtext=CustomFoldText('·')
