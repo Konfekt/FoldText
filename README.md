@@ -8,6 +8,18 @@ This screenshot
 shows a modification of the `CustomFoldText` [function by Christian Brabandt](https://github.com/chrisbra/vim_dotfiles/blob/master/plugin/CustomFoldText.vim) that is more amenable to `syntax` folds.
 (Which in turn is a modification of the `CustomFoldText` [function by Greg Sexton](http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold)).
 
+# Usage
+
+The plugin sets `foldtext` to `CustomFoldText()`.
+Each closed fold then shows its first non-blank line, indented by `shiftwidth` per fold level, and, flush with the right window border, the number of folded lines, absolute and relative to the buffer.
+The gap in between is filled with blanks; to fill it with another delimiter, such as `·` or `-`, set, after the plugin has been loaded (for example in an `after/plugin` file),
+
+```vim
+set foldtext=CustomFoldText('·')
+```
+
+See `:help FoldText` for details.
+
 # Example settings
 
 ```vim
@@ -56,3 +68,7 @@ function! s:ToggleFoldcolumn(fold)
   setlocal foldcolumn?
 endfunction
 ```
+
+# Tests
+
+Run `test/run.sh` to run the test suite headless in Vim and, if installed, Neovim.
